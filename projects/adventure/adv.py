@@ -60,9 +60,11 @@ traversal_path = []
 def traverse_everything(player):
     visited = dict()
 
+    q = Queue()
+    q.enqueue([player.current_room.id])
+
     # Until visited has all the nodes in the map on it, keep repeating.
     while len(visited) != len(world.rooms):
-        # print("CURRENT ROOM: ", player.current_room.id)
         if player.current_room.id not in visited:
             visited[player.current_room.id] = dict()
 
@@ -76,35 +78,52 @@ def traverse_everything(player):
                 rand = list(random.choices(list(visited[player.current_room.id].items()))[0]) # ['n', '?']
             traversal_path.append(rand[0])
             visited[player.current_room.id][rand[0]] = player.current_room.get_room_in_direction(rand[0]).id  
-            old = player.current_room.id
             player.travel(rand[0])
+        # We're at a dead-end. Are there more nodes to explore?
+        elif find_if_questions_there(visited):
+            directions = find_nearest_unknown(player.current_room, visited)
+            directions.pop(0) # [16, 15, 1]
+            for i in directions:
+                move_one_to_unknown(i)  
         else:
-            rand = list(random.choices(list(visited[player.current_room.id].items()))[0]) # ['n', '?']
-            traversal_path.append(rand[0])
-            player.travel(rand[0])
+            print(visited)
+            return visited
 
-        # Add node we just travelled to
-        if player.current_room.id not in visited:
-            visited[player.current_room.id] = dict()
-            for room in player.current_room.get_exits():
-                visited[player.current_room.id][room] = "?" 
+def find_nearest_unknown(starting_node, visited):
+    history = set()
+    q = Queue()
+    q.enqueue([starting_node.id])
 
-        # Edge-cases so we don't go back again while prioriting ?'s
-        if rand[0] == "n":
-            visited[player.current_room.id]["s"] = old
-        elif rand[0] == "s":
-            visited[player.current_room.id]["n"] = old
-        elif rand[0] == "w":
-            visited[player.current_room.id]["e"] = old
-        elif rand[0] == "e":
-            visited[player.current_room.id]["w"] = old
+    while q.size() > 0:
+        path = q.dequeue()
+        v = path[-1]
 
-    return visited
+        if v not in history:
+            if "?" in visited[v].values():
+                return path
+            history.add(v)
 
+            for value in visited[v].values():
+                newPath = list(path)
+                newPath.append(value)
+                q.enqueue(newPath)
+
+def find_if_questions_there(visited):
+    for i in visited.values():
+        for value in i.values():
+            if "?" == value:
+                return True
+    return False
+
+def move_one_to_unknown(i):
+    for letter in player.current_room.get_exits(): # west, north, etc
+        if player.current_room.get_room_in_direction(letter).id == i:
+            # Move player there
+            traversal_path.append(letter)
+            player.travel(letter)
+            return
 
 visited = traverse_everything(player)
-
-# print("HIS IS VISITED ", visited)
 
 # TRAVERSAL TEST
 visited_rooms = set()

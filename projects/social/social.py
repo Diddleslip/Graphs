@@ -147,17 +147,17 @@ class SocialGraph:
 if __name__ == '__main__':
     sg = SocialGraph()
 
-    start_time = time.time()
+    # start_time = time.time()
     sg.populate_graph(300, 150)
-    end_time = time.time()
-    print(f"O(n^2) runtime: {end_time - start_time}")
+    # end_time = time.time()
+    # print(f"O(n^2) runtime: {end_time - start_time}")
     # print(sg.friendships)
-    start_time = time.time()
-    sg.populate_graph_2(300, 150)
-    end_time = time.time()
-    print(f"O(n) runtime: {end_time - start_time}")
-    # connections = sg.get_all_social_paths(1)
-    # print(connections)
+    # start_time = time.time()
+    # sg.populate_graph_2(300, 150)
+    # end_time = time.time()
+    # print(f"O(n) runtime: {end_time - start_time}")
+    connections = sg.get_all_social_paths(1)
+    print(connections)
 
 
 """
