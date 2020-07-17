@@ -1,4 +1,5 @@
 import random
+import time
 
 class Queue():
     def __init__(self):
@@ -19,6 +20,9 @@ class User:
 
 class SocialGraph:
     def __init__(self):
+        self.reset()
+
+    def reset(self):
         self.last_id = 0
         self.users = {}
         self.friendships = {}
@@ -28,12 +32,16 @@ class SocialGraph:
         Creates a bi-directional friendship
         """
         if user_id == friend_id:
-            print("WARNING: You cannot be friends with yourself")
+            return False
+            # print("WARNING: You cannot be friends with yourself")
+            return False
         elif friend_id in self.friendships[user_id] or user_id in self.friendships[friend_id]:
-            print("WARNING: Friendship already exists")
+            # print("WARNING: Friendship already exists")
+            pass
         else:
             self.friendships[user_id].add(friend_id)
             self.friendships[friend_id].add(user_id)
+        return True  # Success!
 
     def add_user(self, name):
         """
@@ -54,9 +62,7 @@ class SocialGraph:
         The number of users must be greater than the average number of friendships.
         """
         # Reset graph
-        self.last_id = 0
-        self.users = {}
-        self.friendships = {}
+        self.reset()
         # !!!! IMPLEMENT ME
 
         # Add users
@@ -78,6 +84,30 @@ class SocialGraph:
             friendship = possible_friendships[i]
             self.add_friendship(friendship[0], friendship[1])
 
+
+    def populate_graph_2(self, num_users, avg_friendships):
+        # Reset graph
+        self.reset()
+        collisions = 0
+       
+        # Add users
+        for i in range(num_users):
+            self.add_user(f"User {i}")
+
+        # Create friendships
+        target_friendships = num_users * avg_friendships
+        total_friendships = 0
+
+        while total_friendships < target_friendships:
+            user_id = random.randint(1, self.last_id)
+            friend_id = random.randint(1, self.last_id)
+
+            if self.add_friendship(user_id, friend_id):
+                total_friendships += 2
+            else:
+                collisions += 1
+
+        print(f"COLLISIONS: {collisions}")
 
     def get_all_social_paths(self, user_id):
         """
@@ -116,9 +146,17 @@ class SocialGraph:
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populate_graph(1000, 5)
-    print(sg.friendships)
-    connections = sg.get_all_social_paths(1)
+
+    start_time = time.time()
+    sg.populate_graph(300, 150)
+    end_time = time.time()
+    print(f"O(n^2) runtime: {end_time - start_time}")
+    # print(sg.friendships)
+    start_time = time.time()
+    sg.populate_graph_2(300, 150)
+    end_time = time.time()
+    print(f"O(n) runtime: {end_time - start_time}")
+    # connections = sg.get_all_social_paths(1)
     # print(connections)
 
 
@@ -132,5 +170,14 @@ To create 100 users with an average of 10 friends each, how many times would you
 If you create 1000 users with an average of 5 random friends each, what percentage of other users will be in a particular user's extended social network? What is the average degree of separation between a user and those in his/her extended network? 
 
 # Assuming this means what's the average length of each array for the problem I just solved, I'm gonna say 5. 
+
+"""
+
+"""
+
+STRETCH: 
+You might have found the results from question #2 above to be surprising. Would you expect results like this in real life? If not, what are some ways you could improve your friendship distribution model for more realistic results?
+
+# I would expect results like this in real life. Because when there's groups of friends, one friend from each clique tends to know eachother, connecting both groups from a graph perspective. One way I would upgrade this algorithm is by having what I just said as an edge-case (where both groups don't have friends from each other, so make the recommendation. Maybe through GPS location. If they're close enough area wise, suggest the most popular person from the group (based on follower's))
 
 """

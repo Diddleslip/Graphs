@@ -74,3 +74,8 @@ def get_ancestors(v):
 # ------------ For testing
 # test_ancestors = [(1, 3), (2, 3), (3, 6), (5, 6), (5, 7), (4, 5), (4, 8), (8, 9), (11, 8), (10, 1)]
 # print(earliest_ancestor(test_ancestors, 3))
+
+if __name__ == '__main__':
+    test_ancestors = [(1, 3), (2, 3), (3, 6), (5, 6), (5, 7),
+                      (4, 5), (4, 8), (8, 9), (11, 8), (10, 2)]
+    print(earliest_ancestor(test_ancestors, 6))
